@@ -8,236 +8,115 @@ import {
   User,
 } from "firebase/auth";
 
-import {
-  doc,
-  setDoc,
-} from "firebase/firestore";
+import { doc, setDoc } from "firebase/firestore";
 
-import {
-  useEffect,
-  useState,
-} from "react";
+import { useEffect, useState } from "react";
 
-import {
-  auth,
-  db,
-} from "../firebase";
+import { auth, db } from "../firebase";
 
 import toast from "react-hot-toast";
 
 export default function GameHUD() {
-
-  const [user, setUser] =
-    useState<User | null>(null);
-
-  /* =========================
-     AUTH STATE
-  ========================= */
+  const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+    });
 
-    const unsubscribe =
-      onAuthStateChanged(
-
-        auth,
-
-        (currentUser) => {
-
-          setUser(
-            currentUser
-          );
-
-        }
-
-      );
-
-    return () =>
-      unsubscribe();
-
+    return () => unsubscribe();
   }, []);
 
-  /* =========================
-     GOOGLE LOGIN
-  ========================= */
+  const loginWithGoogle = async () => {
+    const provider = new GoogleAuthProvider();
 
-  const loginWithGoogle =
-    async () => {
+    try {
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
 
-      const provider =
-        new GoogleAuthProvider();
+      await setDoc(
+        doc(db, "users", user.uid),
+        {
+          uid: user.uid,
+          name: user.displayName,
+          email: user.email,
+          photo: user.photoURL,
+          lastLogin: new Date(),
+          createdAt: new Date(),
+        },
+        {
+          merge: true,
+        }
+      );
 
-      try {
+      toast.success("🔥 Login Successful");
+    } catch (error) {
+      console.log(error);
+      toast.error("❌ Login Failed");
+    }
+  };
 
-        const result =
-          await signInWithPopup(
-            auth,
-            provider
-          );
-
-        const user =
-          result.user;
-
-        // SAVE USER TO FIRESTORE
-        await setDoc(
-
-          doc(
-            db,
-            "users",
-            user.uid
-          ),
-
-          {
-            uid:
-              user.uid,
-
-            name:
-              user.displayName,
-
-            email:
-              user.email,
-
-            photo:
-              user.photoURL,
-
-            lastLogin:
-              new Date(),
-
-            coins: 0,
-
-            createdAt:
-              new Date(),
-          },
-
-          {
-            merge: true,
-          }
-
-        );
-
-        toast.success(
-          "🔥 Login Successful"
-        );
-
-      } catch (error) {
-
-        console.log(error);
-
-        toast.error(
-          "❌ Login Failed"
-        );
-
-      }
-
-    };
-
-  /* =========================
-     LOGOUT
-  ========================= */
-
-  const logout =
-    async () => {
-
-      try {
-
-        await signOut(auth);
-
-        toast.success(
-          "👋 Logged Out"
-        );
-
-      } catch (error) {
-
-        console.log(error);
-
-      }
-
-    };
-
-  /* =========================
-     UI
-  ========================= */
+  const logout = async () => {
+    try {
+      await signOut(auth);
+      toast.success("👋 Logged Out");
+    } catch (error) {
+      console.log(error);
+      toast.error("❌ Logout Failed");
+    }
+  };
 
   return (
-
-    <div className="absolute top-4 left-4 z-[1000]">
-
+    <div className="absolute top-4 left-4 z-[1000] w-[260px] max-w-[calc(100vw-2rem)]">
       {!user ? (
-
         <button
-
-          onClick={
-            loginWithGoogle
-          }
-
-          className="bg-white text-black px-4 py-2 rounded-xl font-bold shadow-xl hover:scale-105 transition-all"
-
+          onClick={loginWithGoogle}
+          className="flex items-center gap-2 rounded-2xl border border-white/20 bg-black/70 px-5 py-3 text-sm font-bold text-white shadow-2xl backdrop-blur-md transition-all hover:scale-[1.03] hover:bg-black/85"
         >
-
-          Login with Google 🔥
-
+          <span className="text-lg">🔥</span>
+          Login with Google
         </button>
-
       ) : (
+        <div className="rounded-3xl border border-white/15 bg-black/65 p-4 text-white shadow-2xl backdrop-blur-xl">
+          <div className="mb-4 flex items-center justify-between">
+            <div>
+              <h1 className="text-lg font-black leading-tight">
+                Treasure Hunt
+              </h1>
+              <p className="text-xs text-yellow-300">Adventure Mode 🏴‍☠️</p>
+            </div>
 
-        <div className="bg-black/80 text-white p-4 rounded-2xl shadow-xl w-64 border border-cyan-500">
+            <div className="rounded-full border border-cyan-400/40 bg-cyan-400/10 px-2 py-1 text-xs font-bold text-cyan-200">
+              LIVE
+            </div>
+          </div>
 
-          <h1 className="text-2xl font-bold">
+          <div className="flex items-center gap-3 rounded-2xl bg-white/10 p-3">
+            <img
+              src={user.photoURL || "/images/user.png"}
+              alt="User profile"
+              className="h-12 w-12 rounded-full border-2 border-yellow-400 object-cover"
+            />
 
-            Treasure Hunt 🏴‍☠️
+            <div className="min-w-0">
+              <p className="truncate text-sm font-bold">
+                {user.displayName || "Player"}
+              </p>
 
-          </h1>
-
-          <p className="mt-2 text-yellow-400">
-
-            Welcome,
-
-          </p>
-
-          <p className="font-bold text-lg">
-
-            {
-              user.displayName
-            }
-
-          </p>
-
-          <img
-
-            src={
-              user.photoURL ||
-              ""
-            }
-
-            className="w-14 h-14 rounded-full mt-3 border-2 border-white"
-
-          />
-
-          <p className="text-xs text-gray-400 mt-3 break-all">
-
-            {
-              user.email
-            }
-
-          </p>
+              <p className="truncate text-xs text-gray-300">
+                {user.email}
+              </p>
+            </div>
+          </div>
 
           <button
-
             onClick={logout}
-
-            className="mt-4 bg-red-500 px-4 py-2 rounded-lg font-bold hover:bg-red-600 transition-all"
-
+            className="mt-4 w-full rounded-2xl bg-red-500 px-4 py-2.5 text-sm font-black text-white shadow-lg transition-all hover:bg-red-600 active:scale-95"
           >
-
             Logout
-
           </button>
-
         </div>
-
       )}
-
     </div>
-
   );
-
 }
