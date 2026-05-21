@@ -1,18 +1,33 @@
 "use client";
 
-import MapComponent from "../components/MapComponent";
-import GameHUD from "../components/GameHUD";
+import dynamic from "next/dynamic";
+
+const MapComponent = dynamic(
+  () => import("../components/MapComponent"),
+  {
+    ssr: false,
+  }
+);
+
+const GameHUD = dynamic(
+  () => import("../components/GameHUD"),
+  {
+    ssr: false,
+  }
+);
 
 export default function Home() {
-  return (
-    <main className="relative h-screen overflow-hidden">
-      
-      <GameHUD />
 
-      <div className="absolute inset-0 bg-black/20 z-[500] pointer-events-none" />
+  return (
+
+    <main className="relative">
+
+      <GameHUD />
 
       <MapComponent />
 
     </main>
+
   );
+
 }
