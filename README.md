@@ -1,36 +1,218 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🏴‍☠️ Treasure Hunt Game
 
-## Getting Started
+A realtime multiplayer-style Treasure Hunt game built using:
 
-First, run the development server:
+- Next.js 15
+- TypeScript
+- Firebase
+- Firestore
+- Google Authentication
+- React Leaflet
+- Geolocation API
+
+---
+
+# ✨ Features
+
+✅ Google Login Authentication  
+✅ Live GPS Tracking  
+✅ Realtime Treasure Updates  
+✅ Admin Dashboard  
+✅ Firestore Database  
+✅ Coin Reward System  
+✅ Treasure Collection  
+✅ Persistent Player Data  
+✅ Realtime Multiplayer Feel  
+✅ Route Navigation  
+✅ Responsive UI
+
+---
+
+# 📸 Screenshots
+
+Add your screenshots here later.
+
+---
+
+# 🚀 Live Demo
+
+https://treasure-hunt-game-fv8k.vercel.app/
+
+---
+
+# ⚙️ Installation
+
+## 1. Clone Repository
+
+```bash
+git clone https://github.com/YOUR_USERNAME/treasure-hunt-game.git
+```
+
+---
+
+## 2. Open Project
+
+```bash
+cd treasure-hunt-game
+```
+
+---
+
+## 3. Install Dependencies
+
+```bash
+npm install
+```
+
+---
+
+## 4. Create Environment File
+
+Create:
+
+```txt
+.env.local
+```
+
+Add:
+
+```env
+NEXT_PUBLIC_FIREBASE_API_KEY=
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=
+NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=
+NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=
+NEXT_PUBLIC_FIREBASE_APP_ID=
+NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID=
+```
+
+---
+
+## 5. Run Project
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+# 🔥 Firebase Setup
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Enable:
 
-## Learn More
+- Google Authentication
+- Firestore Database
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Firestore Collections
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### users
 
-## Deploy on Vercel
+Stores:
+- coins
+- collected treasures
+- player data
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### treasures
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Stores:
+- treasure name
+- reward
+- latitude
+- longitude
+
+### admins
+
+Stores admin access.
+
+Document ID must equal Firebase Auth UID.
+
+---
+
+# 🔐 Firestore Rules
+
+```js
+rules_version = '2';
+
+service cloud.firestore {
+
+  match /databases/{database}/documents {
+
+    match /users/{userId} {
+
+      allow read, write:
+      if request.auth != null
+      && request.auth.uid == userId;
+
+    }
+
+    match /admins/{userId} {
+
+      allow read:
+      if request.auth != null
+      && request.auth.uid == userId;
+
+      allow write: if false;
+
+    }
+
+    match /treasures/{treasureId} {
+
+      allow read: if true;
+
+      allow create, update, delete:
+      if request.auth != null
+      && exists(
+        /databases/$(database)/documents/admins/$(request.auth.uid)
+      );
+
+    }
+
+  }
+
+}
+```
+
+---
+
+# 🗺️ Admin Panel
+
+Open:
+
+```txt
+/admin
+```
+
+Only admins can create treasures.
+
+---
+
+# 🛠️ Tech Stack
+
+- Next.js
+- React
+- TypeScript
+- Firebase
+- Firestore
+- React Leaflet
+- Tailwind CSS
+- Geolib
+
+---
+
+# 📦 Future Improvements
+
+- Leaderboard
+- Multiplayer Players
+- Treasure Animations
+- Sound Effects
+- Daily Rewards
+- Treasure Radar
+- PWA Mobile App
+
+---
+
+# 👨‍💻 Author
+
+Ritik Sharma
