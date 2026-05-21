@@ -16,18 +16,19 @@ const GameHUD = dynamic(
   }
 );
 
+const Leaderboard = dynamic(
+  () => import("../components/Leaderboard"),
+  {
+    ssr: false,
+  }
+);
+
 export default function Home() {
-
   return (
-
     <main className="relative">
-
       <GameHUD />
-
+      <Leaderboard />
       <MapComponent />
-
     </main>
-
   );
-
 }
