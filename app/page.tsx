@@ -23,11 +23,19 @@ const Leaderboard = dynamic(
   }
 );
 
+const GlobalChat = dynamic(
+  () => import("../components/GlobalChat"),
+  {
+    ssr: false,
+  }
+);
+
 export default function Home() {
   return (
     <main className="relative">
       <GameHUD />
       <Leaderboard />
+      <GlobalChat />
       <MapComponent />
     </main>
   );
