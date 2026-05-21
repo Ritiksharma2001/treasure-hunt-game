@@ -32,7 +32,7 @@ A realtime multiplayer-style Treasure Hunt game built using:
 
 ### 🗺️ Player Dashboard
 
-![Player Dashboard](public/screenshots/player-dashboard.png)
+![Player Dashboard](public/screenshots/players-dashboard.png)
 
 ---
 
