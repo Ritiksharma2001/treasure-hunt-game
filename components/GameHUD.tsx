@@ -8,7 +8,11 @@ import {
   User,
 } from "firebase/auth";
 
-import { doc, setDoc } from "firebase/firestore";
+import {
+  doc,
+  setDoc,
+  getDoc,
+} from "firebase/firestore";
 
 import { useEffect, useState } from "react";
 
@@ -20,7 +24,25 @@ export default function GameHUD() {
   const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+      if (!currentUser) {
+        setUser(null);
+        return;
+      }
+
+      const bannedRef = doc(db, "bannedUsers", currentUser.uid);
+      const bannedSnap = await getDoc(bannedRef);
+
+      if (bannedSnap.exists()) {
+        toast.error("🚫 Your account has been banned");
+
+        await signOut(auth);
+
+        setUser(null);
+
+        return;
+      }
+
       setUser(currentUser);
     });
 
@@ -33,6 +55,17 @@ export default function GameHUD() {
     try {
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
+
+      const bannedRef = doc(db, "bannedUsers", user.uid);
+      const bannedSnap = await getDoc(bannedRef);
+
+      if (bannedSnap.exists()) {
+        toast.error("🚫 Your account has been banned");
+
+        await signOut(auth);
+
+        return;
+      }
 
       await setDoc(
         doc(db, "users", user.uid),
@@ -103,9 +136,7 @@ export default function GameHUD() {
                 {user.displayName || "Player"}
               </p>
 
-              <p className="truncate text-xs text-gray-300">
-                {user.email}
-              </p>
+              <p className="truncate text-xs text-gray-300">{user.email}</p>
             </div>
           </div>
 
