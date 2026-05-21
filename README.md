@@ -30,9 +30,15 @@ A realtime multiplayer-style Treasure Hunt game built using:
 
 # 📸 Screenshots
 
-Add your screenshots here later.
+### 🗺️ Player Dashboard
+
+![Player Dashboard](public/screenshots/player-dashboard.png)
 
 ---
+
+### 🔐 Admin Dashboard
+
+![Admin Dashboard](public/screenshots/admin-dashboard.png)
 
 # 🚀 Live Demo
 
